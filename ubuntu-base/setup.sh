@@ -113,27 +113,35 @@ sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flat
 print_msg "Menginstal aplikasi GUI satu per satu..."
 
 # Daftar Aplikasi dengan Application ID yang valid di Flathub
-# Catatan: Winbox tidak disertakan karena tidak tersedia secara resmi di Flathub.
+# CATATAN: Semua aplikasi di bawah ini di-comment (#) secara default.
+# Hal ini untuk mencegah aplikasi menjadi ganda (bertumpuk) jika Anda 
+# sudah menginstalnya lewat Cosmic Store / Pop!_Shop (versi .deb).
+# Silakan hapus tanda pagar (#) hanya untuk aplikasi yang belum Anda miliki 
+# dan benar-benar ingin diinstal dari Flatpak.
 FLATPAK_APPS=(
-    "com.google.AndroidStudio"       # Android Studio
-    "com.anydesk.Anydesk"            # AnyDesk
-    "io.dbeaver.DBeaverCommunity"    # DBeaver
-    "org.telegram.desktop"           # Telegram
-    "io.github.shiftey.Desktop"      # GitHub Desktop (Community fork)
-    "org.gimp.GIMP"                  # GIMP
-    "org.godotengine.Godot"          # Godot Engine
-    "com.google.Chrome"              # Google Chrome
-    "org.inkscape.Inkscape"          # Inkscape
-    "com.obsproject.Studio"          # OBS Studio
-    "org.shotcut.Shotcut"            # Shotcut
-    "org.videolan.VLC"               # VLC
-    "org.libreoffice.LibreOffice"    # LibreOffice
+    # "com.google.AndroidStudio"       # Android Studio
+    # "com.anydesk.Anydesk"            # AnyDesk
+    # "io.dbeaver.DBeaverCommunity"    # DBeaver
+    # "org.telegram.desktop"           # Telegram
+    # "io.github.shiftey.Desktop"      # GitHub Desktop (Community fork)
+    # "org.gimp.GIMP"                  # GIMP
+    # "org.godotengine.Godot"          # Godot Engine
+    # "com.google.Chrome"              # Google Chrome
+    # "org.inkscape.Inkscape"          # Inkscape
+    # "com.obsproject.Studio"          # OBS Studio
+    # "org.shotcut.Shotcut"            # Shotcut
+    # "org.videolan.VLC"               # VLC
+    # "org.libreoffice.LibreOffice"    # LibreOffice
 )
 
-for app in "${FLATPAK_APPS[@]}"; do
-    print_msg "Menginstal $app..."
-    sudo flatpak install -y flathub "$app"
-done
+if [ ${#FLATPAK_APPS[@]} -eq 0 ]; then
+    print_msg "Tidak ada aplikasi Flatpak yang diaktifkan (semua di-comment). Melewati instalasi..."
+else
+    for app in "${FLATPAK_APPS[@]}"; do
+        print_msg "Menginstal $app..."
+        sudo flatpak install -y flathub "$app"
+    done
+fi
 
 # 5. Wallpapers
 print_msg "Tahap 5: Mengunduh Wallpaper..."
