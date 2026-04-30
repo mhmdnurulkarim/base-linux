@@ -1,0 +1,2 @@
+https://groups.google.com/g/qtile-dev
+http://docs.qtile.org/en/latest/manual/config/index.html

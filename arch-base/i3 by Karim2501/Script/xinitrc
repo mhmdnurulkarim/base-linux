@@ -1,0 +1,2 @@
+feh --bg-scale ~/Pictures/Wallpaper/wallpaper9.jpg
+exec i3

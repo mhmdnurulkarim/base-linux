@@ -1,0 +1,13 @@
+set encoding=UTF-8
+filetype plugin indent on
+syntax on
+set number relativenumber
+set backspace=indent,eol,start
+set shiftwidth=4
+set autoindent
+set smartindent
+set tabstop=4
+set softtabstop=4
+set expandtab
+set noswapfile
+colorscheme gruvbox
