@@ -25,7 +25,7 @@ print_msg "Tahap 1: System Preparation (Update & Upgrade)..."
 sudo apt update
 sudo apt upgrade -y
 
-print_msg "Menginstal dependensi dasar (curl, wget, git, unzip)..."
+print_msg "Menginstal dependensi dasar (curl, wget, git, unzip, rar, unrar)..."
 sudo apt install -y curl wget git unzip rar unrar
 
 # 2. CLI Tools & Shell
@@ -42,10 +42,50 @@ fi
 
 print_msg "Menginstal plugin ZSH (syntax-highlighting, autosuggestions, completions) & Powerlevel10k..."
 ZSH_CUSTOM="$HOME/.oh-my-zsh/custom"
-[ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ] && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting"
-[ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ] && git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM}/plugins/zsh-autosuggestions"
-[ ! -d "$ZSH_CUSTOM/plugins/zsh-completions" ] && git clone https://github.com/zsh-users/zsh-completions "${ZSH_CUSTOM}/plugins/zsh-completions"
-[ ! -d "$ZSH_CUSTOM/themes/powerlevel10k" ] && git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM}/themes/powerlevel10k"
+
+# Menggunakan blok if standar agar set -e tidak menghentikan script jika folder sudah ada
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ]; then
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting"
+fi
+
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ]; then
+    git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM}/plugins/zsh-autosuggestions"
+fi
+
+if [ ! -d "$ZSH_CUSTOM/plugins/zsh-completions" ]; then
+    git clone https://github.com/zsh-users/zsh-completions "${ZSH_CUSTOM}/plugins/zsh-completions"
+fi
+
+if [ ! -d "$ZSH_CUSTOM/themes/powerlevel10k" ]; then
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM}/themes/powerlevel10k"
+fi
+
+print_msg "Mengunduh dan menginstal Font MesloLGS NF untuk Powerlevel10k..."
+FONT_DIR="$HOME/.local/share/fonts"
+mkdir -p "$FONT_DIR"
+
+# Mengunduh font secara diam-diam (-q) agar output terminal tetap bersih
+wget -q -O "$FONT_DIR/MesloLGS NF Regular.ttf" "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf"
+wget -q -O "$FONT_DIR/MesloLGS NF Bold.ttf" "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf"
+wget -q -O "$FONT_DIR/MesloLGS NF Italic.ttf" "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf"
+wget -q -O "$FONT_DIR/MesloLGS NF Bold Italic.ttf" "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf"
+
+# Memperbarui cache font sistem
+fc-cache -fv
+
+print_msg "Mengatur MesloLGS NF sebagai font default di Terminal..."
+# Mendapatkan ID profil default dari GNOME Terminal
+GNOME_TERMINAL_PROFILE=$(gsettings get org.gnome.Terminal.ProfilesList default | tr -d \')
+
+if [ -n "$GNOME_TERMINAL_PROFILE" ]; then
+    # Mematikan penggunaan font sistem
+    gsettings set "org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/" use-system-font false
+    # Mengatur font custom ke MesloLGS NF ukuran 11
+    gsettings set "org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$GNOME_TERMINAL_PROFILE/" font 'MesloLGS NF 11'
+    print_msg "Font terminal berhasil diubah ke MesloLGS NF."
+else
+    print_msg "Gagal mendeteksi profil GNOME Terminal. Anda mungkin perlu mengatur font secara manual."
+fi
 
 print_msg "Mengonfigurasi .zshrc..."
 cat << 'EOF' > "$HOME/.zshrc"
@@ -75,6 +115,13 @@ autoload -U compinit && compinit
 alias update="sudo apt update && sudo apt upgrade -y"
 alias install="sudo apt install"
 
+# Composer Global Bin Path
+export PATH="$HOME/.config/composer/vendor/bin:$PATH"
+
+# NVM Configuration
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 EOF
 
 # 3. Development Environment
@@ -85,18 +132,26 @@ sudo apt install -y postgresql mysql-server
 sudo systemctl enable --now postgresql
 sudo systemctl enable --now mysql
 
+print_msg "Menyiapkan role PostgreSQL superuser untuk user $USER..."
+# Memakai || true agar script tidak berhenti jika role sudah pernah dibuat
+sudo -u postgres createuser -s "$USER" || true
+
 print_msg "Menginstal PHP dan ekstensi esensial untuk Laravel/Web Development..."
-sudo apt install -y php php-cli php-zip php-mbstring php-xml php-curl php-pgsql php-mysql
+# Menambahkan php-gd, php-bcmath, dan php-sqlite3
+sudo apt install -y php php-cli php-zip php-mbstring php-xml php-curl php-pgsql php-mysql php-gd php-bcmath php-sqlite3
 
 print_msg "Menginstal Composer secara global..."
 curl -sS https://getcomposer.org/installer | php
 sudo mv composer.phar /usr/local/bin/composer
 
+print_msg "Menginstal Laravel Installer secara global..."
+composer global require laravel/installer
+
 print_msg "Menginstal NVM dan Node.js..."
 # Mengunduh dan menginstal NVM
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 
-# Memuat NVM ke environment shell saat ini
+# Memuat NVM ke environment shell saat ini (agar perintah `nvm install` di baris berikutnya dikenali)
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
@@ -110,20 +165,16 @@ print_msg "Memastikan instalasi Flatpak dan repositori Flathub..."
 sudo apt install -y flatpak
 sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
-print_msg "Menginstal aplikasi GUI satu per satu..."
+print_msg "Menyiapkan aplikasi GUI..."
 
-# Daftar Aplikasi dengan Application ID yang valid di Flathub
-# CATATAN: Semua aplikasi di bawah ini di-comment (#) secara default.
-# Hal ini untuk mencegah aplikasi menjadi ganda (bertumpuk) jika Anda 
-# sudah menginstalnya lewat Cosmic Store / Pop!_Shop (versi .deb).
-# Silakan hapus tanda pagar (#) hanya untuk aplikasi yang belum Anda miliki 
-# dan benar-benar ingin diinstal dari Flatpak.
+# Daftar Aplikasi Flatpak
+# Hapus tanda pagar (#) pada aplikasi yang ingin diinstal
 FLATPAK_APPS=(
     # "com.google.AndroidStudio"       # Android Studio
     # "com.anydesk.Anydesk"            # AnyDesk
     # "io.dbeaver.DBeaverCommunity"    # DBeaver
     # "org.telegram.desktop"           # Telegram
-    # "io.github.shiftey.Desktop"      # GitHub Desktop (Community fork)
+    # "io.github.shiftey.Desktop"      # GitHub Desktop
     # "org.gimp.GIMP"                  # GIMP
     # "org.godotengine.Godot"          # Godot Engine
     # "com.google.Chrome"              # Google Chrome
@@ -137,10 +188,8 @@ FLATPAK_APPS=(
 if [ ${#FLATPAK_APPS[@]} -eq 0 ]; then
     print_msg "Tidak ada aplikasi Flatpak yang diaktifkan (semua di-comment). Melewati instalasi..."
 else
-    for app in "${FLATPAK_APPS[@]}"; do
-        print_msg "Menginstal $app..."
-        sudo flatpak install -y flathub "$app"
-    done
+    print_msg "Menginstal aplikasi Flatpak secara bersamaan..."
+    sudo flatpak install -y flathub "${FLATPAK_APPS[@]}"
 fi
 
 # 5. Wallpapers
@@ -150,7 +199,7 @@ if [ -d "$HOME/Pictures/my-wallpaper" ]; then
     cd "$HOME/Pictures/my-wallpaper" && git pull
 else
     print_msg "Cloning wallpaper repository..."
-    git clone git@github.com:mhmdnurulkarim/my-wallpaper.git "$HOME/Pictures/my-wallpaper"
+    git clone https://github.com/mhmdnurulkarim/my-wallpaper.git "$HOME/Pictures/my-wallpaper"
 fi
 
 # 6. Finishing Touch
@@ -159,4 +208,4 @@ print_msg "Membersihkan cache paket yang sudah tidak digunakan..."
 sudo apt autoremove -y
 sudo apt autoclean -y
 
-print_msg "Instalasi Selesai! Silakan restart komputer atau log out agar ZSH bisa aktif."
+print_msg "Instalasi Selesai! Silakan restart komputer atau log out agar ZSH dan konfigurasi baru bisa aktif."
