@@ -111,9 +111,38 @@ autoload -U compinit && compinit
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-# Alias
+# Alias Manajemen Package
 alias update="sudo apt update && sudo apt upgrade -y"
 alias install="sudo apt install"
+alias remove="sudo apt remove"
+alias purge="sudo apt purge"
+alias autoremove="sudo apt autoremove -y && sudo apt autoclean"
+
+# Alias PostgreSQL
+alias start_pgsql="sudo systemctl start postgresql"
+alias stop_pgsql="sudo systemctl stop postgresql"
+alias status_pgsql="sudo systemctl status postgresql"
+
+# Alias MySQL/MariaDB
+alias start_mysql="sudo systemctl start mysql"
+alias stop_mysql="sudo systemctl stop mysql"
+alias status_mysql="sudo systemctl status mysql"
+
+# Git Aliases
+alias g='git'
+alias gs='git status'
+alias ga='git add'
+alias gaa='git add .'
+alias gc='git commit -m'
+alias gca='git commit -am'
+alias gp='git push'
+alias gl='git pull'
+alias gco='git checkout'
+alias gcb='git checkout -b'
+alias gb='git branch'
+alias gd='git diff'
+alias gm='git merge'
+alias glog='git log --oneline --graph --decorate --all'
 
 # Composer Global Bin Path
 export PATH="$HOME/.config/composer/vendor/bin:$PATH"

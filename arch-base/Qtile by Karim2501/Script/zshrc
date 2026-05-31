@@ -25,13 +25,39 @@ autoload -U compinit && compinit
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-# Alias
+# Alias Manajemen Package
 alias pacsyu="sudo pacman -Syyu"
 alias paci="sudo pacman -S"
 alias parsy="paru -Syyu"
 alias pari="paru -S"
 alias py3="python3"
 alias winbox="wine /home/Linux/SMK\ 1/.mikrotik/Mikrotik\ Installer/winbox\ 3.27.exe &"
+
+# Alias PostgreSQL
+alias start_pgsql="sudo systemctl start postgresql"
+alias stop_pgsql="sudo systemctl stop postgresql"
+alias status_pgsql="sudo systemctl status postgresql"
+
+# Alias MySQL/MariaDB
+alias start_mysql="sudo systemctl start mysql"
+alias stop_mysql="sudo systemctl stop mysql"
+alias status_mysql="sudo systemctl status mysql"
+
+# Git Aliases
+alias g='git'
+alias gs='git status'
+alias ga='git add'
+alias gaa='git add .'
+alias gc='git commit -m'
+alias gca='git commit -am'
+alias gp='git push'
+alias gl='git pull'
+alias gco='git checkout'
+alias gcb='git checkout -b'
+alias gb='git branch'
+alias gd='git diff'
+alias gm='git merge'
+alias glog='git log --oneline --graph --decorate --all'
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
