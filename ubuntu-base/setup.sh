@@ -68,12 +68,10 @@ APPS=(
     "zsh" "$(get_desc_cmd zsh "ZSH, Oh-My-Zsh, Neovim & Ranger")" "$(get_status_cmd zsh)"
     "opencode-ai" "$(get_desc_cmd opencode-ai "opencode-ai (NPM)")" "$(get_status_cmd opencode-ai)"
     "9router" "$(get_desc_cmd 9router "9router (NPM)")" "$(get_status_cmd 9router)"
-    "antigravity" "$(get_desc_cmd antigravity "antigravity (NPM)")" "$(get_status_cmd antigravity)"
     "claude-code" "$(get_desc_cmd claude "Claude Code CLI")" "$(get_status_cmd claude)"
     "skills" "$(get_desc_cmd skills "Skills CLI")" "$(get_status_cmd skills)"
     "postgresql" "$(get_desc_cmd psql "PostgreSQL Database")" "$(get_status_cmd psql)"
     "mysql" "$(get_desc_cmd mysql "MySQL Server")" "$(get_status_cmd mysql)"
-    "tableplus" "$(get_desc_cmd tableplus "TablePlus Database Client")" "$(get_status_cmd tableplus)"
     "php" "$(get_desc_cmd php "PHP & Ekstensi (Laravel)")" "$(get_status_cmd php)"
     "composer" "$(get_desc_cmd composer "Composer & Laravel Installer")" "$(get_status_cmd composer)"
     "pm2" "$(get_desc_cmd pm2 "PM2 Process Manager")" "$(get_status_cmd pm2)"
@@ -216,7 +214,7 @@ fi
 # ==========================================
 # 3. EKSEKUSI: Vibe Code & CLI Apps
 # ==========================================
-if [[ $CHOICES == *"opencode-ai"* ]] || [[ $CHOICES == *"9router"* ]] || [[ $CHOICES == *"antigravity"* ]] || [[ $CHOICES == *"claude-code"* ]] || [[ $CHOICES == *"skills"* ]]; then
+if [[ $CHOICES == *"opencode-ai"* ]] || [[ $CHOICES == *"9router"* ]] || [[ $CHOICES == *"claude-code"* ]] || [[ $CHOICES == *"skills"* ]]; then
     print_msg "Menyiapkan Vibe Code & CLI Apps..."
     if [ ! -d "$HOME/.nvm" ]; then
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
@@ -230,9 +228,8 @@ if [[ $CHOICES == *"opencode-ai"* ]] || [[ $CHOICES == *"9router"* ]] || [[ $CHO
 
     [[ $CHOICES == *"opencode-ai"* ]] && npm i -g opencode-ai
     [[ $CHOICES == *"9router"* ]] && npm i -g 9router
-    [[ $CHOICES == *"antigravity"* ]] && npm i -g antigravity
     [[ $CHOICES == *"skills"* ]] && npm i -g skills
-    [[ $CHOICES == *"claude-code"* ]] && curl -fsSL https://claude.com/cli/install.sh | bash
+    [[ $CHOICES == *"claude-code"* ]] && curl -fsSL https://claude.ai/install.sh | bash
 fi
 
 # ==========================================
@@ -249,13 +246,6 @@ if [[ $CHOICES == *"mysql"* ]]; then
     print_msg "Menginstal MySQL..."
     sudo apt install -y mysql-server
     sudo systemctl enable --now mysql
-fi
-
-if [[ $CHOICES == *"tableplus"* ]]; then
-    print_msg "Menginstal TablePlus..."
-    wget -qO - https://deb.tableplus.com/apt.tableplus.com.gpg.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/tableplus-archive.gpg > /dev/null
-    sudo add-apt-repository -y "deb [arch=amd64] https://deb.tableplus.com/debian/26 tableplus main"
-    sudo apt update && sudo apt install -y tableplus
 fi
 
 if [[ $CHOICES == *"php"* ]]; then
