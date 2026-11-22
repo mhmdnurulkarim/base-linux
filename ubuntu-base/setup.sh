@@ -178,7 +178,7 @@ autoload -U compinit && compinit
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # Alias Manajemen Package
-alias update="sudo apt update && sudo apt upgrade -y"
+alias update="sudo apt update && sudo apt upgrade -y && sudo flatpak update -y"
 alias install="sudo apt install"
 alias remove="sudo apt remove"
 alias purge="sudo apt purge"
@@ -314,11 +314,18 @@ done
 
 if [ -n "$FLATPAK_APPS" ]; then
     print_msg "Menyiapkan Flatpak & Menginstal Aplikasi GUI..."
+    sudo add-apt-repository -y ppa:flatpak/stable
+    sudo apt update
     sudo apt install -y flatpak
     sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
-    print_msg "Menginstal: $FLATPAK_APPS"
-    sudo flatpak install -y flathub $FLATPAK_APPS
+    print_msg "Menginstal / Memperbarui: $FLATPAK_APPS"
+    sudo flatpak install -y --or-update flathub $FLATPAK_APPS
+fi
+
+if command -v flatpak &> /dev/null; then
+    print_msg "Memperbarui seluruh aplikasi dan runtime Flatpak ke versi terbaru..."
+    sudo flatpak update -y
 fi
 
 # ==========================================
